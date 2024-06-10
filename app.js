@@ -1,41 +1,76 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+ const session = require('express-session');
+ const bodyParser = require('body-parser');
+ const bcrypt = require('bcrypt');
+ const User = require('./models/users');
+ const sessionStore = require('./sesion/sessionStore');
+ const sequelize = require('./db/database');
+const isAuthenticated = require('./middlewares/auth');
+ const app = express();
+ app.use(bodyParser.urlencoded({ extended: true }));
+ app.use(session({
+  secret: 'your_secret_key',
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 60 * 60 * 1000 // 1 hora
+  }
+ }));
+ // Sincronizar la base de datos
+ sequelize.sync();
+ // Rutas
+ app.get('/', (req, res) => {
+  res.send({
+    msg: "Hola"
+  });
+ });
+ app.post('/signup', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    await User.create({ username, password: hashedPassword });
+    res.redirect('/login');
+  } catch (error) {
+    res.send('Username already exists');
+  }
+ });
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+ app.get('/login', (req, res) => {
+  res.send({
+    msg:"Entraste al login"
+  });
+ });
 
-var app = express();
+ app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ where: { username } });
+  if (user && await bcrypt.compare(password, user.password)) {
+    req.session.userId = user.id;
+    res.redirect('/profile');
+  } else {
+    res.send('Invalid username or password');
+  }
+ });
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+ app.get('/profile', isAuthenticated, async (req, res) => {
+  const user = await User.findByPk(req.session.userId);
+  res.send({
+    msg: "Entraste dentro del perfil"
+  });
+ });
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
+ app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.send('Error logging out');
+    }
+    res.redirect('/');
+  });
+ });
+ 
+ // Iniciar el servidor
+ const PORT = process.env.PORT || 3000;
+ app.listen(PORT, () => {
+  console.log(`Server: http://localhost:${PORT}`)
+ });
