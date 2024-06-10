@@ -1,30 +1,43 @@
+//* Modulos requeridos
 const express = require('express');
- const session = require('express-session');
- const bodyParser = require('body-parser');
- const bcrypt = require('bcrypt');
- const User = require('./models/users');
- const sessionStore = require('./sesion/sessionStore');
- const sequelize = require('./db/database');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const path = require('path');
+const morgan = require('morgan');
+const User = require('./models/users');
+const sessionStore = require('./sesion/sessionStore');
+const sequelize = require('./db/database');
 const isAuthenticated = require('./middlewares/auth');
- const app = express();
- app.use(bodyParser.urlencoded({ extended: true }));
- app.use(session({
-  secret: 'your_secret_key',
-  store: sessionStore,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 60 * 60 * 1000 // 1 hora
-  }
- }));
+const app = express();
+
+//! Configuracion de la app
+
+//* Configuracion de la App
+app.set('puerto', process.env.PORT || 3000)
+app.set('view engine', 'ejs')
+app.set('views', path.join(__dirname, './views'))
+
+
+//? Middleware
+app.use(express.urlencoded({extended: true}));
+app.use(express.json())
+app.use(morgan('dev'))
+//app.use(bodyParser.urlencoded({ extended: true }));
+
+
+app.use(session({
+secret: 'your_secret_key',
+store: sessionStore,
+resave: false,
+saveUninitialized: false,
+cookie: {
+  maxAge: 60 * 60 * 1000 // 1 hora
+}
+}));
  // Sincronizar la base de datos
  sequelize.sync();
- // Rutas
- app.get('/', (req, res) => {
-  res.send({
-    msg: "Hola"
-  });
- });
+
  app.post('/signup', async (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -69,8 +82,14 @@ const isAuthenticated = require('./middlewares/auth');
   });
  });
  
- // Iniciar el servidor
- const PORT = process.env.PORT || 3000;
- app.listen(PORT, () => {
-  console.log(`Server: http://localhost:${PORT}`)
- });
+//! Starting server
+app.listen( app.get('puerto'), async()=>{
+  const ports =
+  console.log(`Server: http://localhost:${app.get('puerto')}`)
+  await sequelize.sync({force : false})
+  .then (()=>{
+      console.log('Está conectado a la base de datos con Sequelize');
+  }).catch((errpr)=>{
+      console.log('Error al conectarse :(', error);
+  })
+})
