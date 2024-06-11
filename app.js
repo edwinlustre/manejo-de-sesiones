@@ -1,15 +1,10 @@
 //* Modulos requeridos
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
 const path = require('path');
 const morgan = require('morgan');
-const User = require('./models/users.js');
 const sessionStore = require('./sesion/sessionStore');
 const sequelize = require('./db/database');
-const isAuthenticated = require('./middlewares/auth');
-const routes_home = require('./routes/home.js')
 const authRoutes = require('./routes/auth.js');
 const app = express();
 
