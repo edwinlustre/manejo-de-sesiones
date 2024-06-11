@@ -9,6 +9,7 @@ const User = require('./models/users');
 const sessionStore = require('./sesion/sessionStore');
 const sequelize = require('./db/database');
 const isAuthenticated = require('./middlewares/auth');
+const routes_home = require('./routes/home.js')
 const app = express();
 
 //! Configuracion de la app
@@ -37,6 +38,8 @@ cookie: {
 }));
  // Sincronizar la base de datos
  sequelize.sync();
+
+ app.use('/', routes_home)
 
  app.post('/signup', async (req, res) => {
   const { username, password } = req.body;
