@@ -5,11 +5,12 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const morgan = require('morgan');
-const User = require('./models/users');
+const User = require('./models/users.js');
 const sessionStore = require('./sesion/sessionStore');
 const sequelize = require('./db/database');
 const isAuthenticated = require('./middlewares/auth');
 const routes_home = require('./routes/home.js')
+const authRoutes = require('./routes/auth.js');
 const app = express();
 
 //! Configuracion de la app
@@ -28,62 +29,24 @@ app.use(morgan('dev'))
 
 
 app.use(session({
-secret: 'your_secret_key',
-store: sessionStore,
-resave: false,
-saveUninitialized: false,
-cookie: {
-  maxAge: 60 * 60 * 1000 // 1 hora
-}
+  secret: 'your_secret_key',
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+      maxAge: 60 * 60 * 1000 // 1 hora
+  }
 }));
- // Sincronizar la base de datos
- sequelize.sync();
 
- app.use('/', routes_home)
+// Sincronizar la base de datos
+sequelize.sync();
 
- app.post('/signup', async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  try {
-    await User.create({ username, password: hashedPassword });
-    res.redirect('/login');
-  } catch (error) {
-    res.send('Username already exists');
-  }
- });
+// Rutas
+app.use(authRoutes);
 
- app.get('/login', (req, res) => {
-  res.send({
-    msg:"Entraste al login"
-  });
- });
-
- app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ where: { username } });
-  if (user && await bcrypt.compare(password, user.password)) {
-    req.session.userId = user.id;
-    res.redirect('/profile');
-  } else {
-    res.send('Invalid username or password');
-  }
- });
-
- app.get('/profile', isAuthenticated, async (req, res) => {
-  const user = await User.findByPk(req.session.userId);
-  res.send({
-    msg: "Entraste dentro del perfil"
-  });
- });
-
- app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      return res.send('Error logging out');
-    }
-    res.redirect('/');
-  });
- });
+app.get('/', (req, res) => {
+  res.render('home', { userId: req.session.userId });
+});
  
 //! Starting server
 app.listen( app.get('puerto'), async()=>{
