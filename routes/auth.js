@@ -19,6 +19,11 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+router.get('/error', (req, res) => {
+    res.render('error');
+  });
+
+  
 router.get('/login', (req, res) => {
     res.render('login');
 });
@@ -30,20 +35,7 @@ router.post('/login', async (req, res) => {
         req.session.userId = user.id;
         res.redirect('/profile');
     } else {
-        res.send(`
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Página de Ejemplo</title>
-        </head>
-        <body>
-            <h1>Haz tenido un error en el usuario o contraseña</h1>
-            <p>Este es un ejemplo de cómo enviar HTML utilizando res.send() en Express.</p>
-        </body>
-        </html>
-    `);
+        res.redirect('/error');
     }
 });
 
