@@ -5,7 +5,7 @@ const path = require('path');
 const morgan = require('morgan');
 const sessionStore = require('./sesion/sessionStore');
 const sequelize = require('./db/database');
-const authRoutes = require('./routes/auth.js');
+const authRoutes = require('./routes/user.js');
 const app = express();
 
 //! Configuracion de la app
