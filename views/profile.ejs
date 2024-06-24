@@ -38,12 +38,46 @@
       </nav>
 
 
-    <div class="container bg-light">
-        <h1>Inicio</h1>
-        <h4>Bienvenido: <%= user.username %></h4>
-        <iframe src="https://gifer.com/embed/xw" width=480 height=480.000 frameBorder="0" allowFullScreen></iframe>
+      <div class="container mt-5">
+        <h1>Perfil de Usuario</h1>
+        <button class="btn btn-primary" onclick="window.location.href='/add-user'">Agregar Usuario</button>
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Edad</th>
+                    <th>Sexo</th>
+                    <th>Número de Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% details.forEach(detail => { %>
+                    <tr>
+                        <td><%= detail.nombre %></td>
+                        <td><%= detail.apellidopat %></td>
+                        <td><%= detail.apellidomat %></td>
+                        <td><%= detail.edad %></td>
+                        <td><%= detail.sexo %></td>
+                        <td><%= detail.num_telefono %></td>
+                        <td>
+                            <button class="btn btn-warning" onclick="window.location.href='/update-user/<%= detail.id %>'">Actualizar</button>
+                            <form action="/delete-user" method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<%= detail.id %>">
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <a href="/modifications" class="btn btn-secondary">View My Modifications</a>
+    </div> 
 
-    </div>
+    
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>

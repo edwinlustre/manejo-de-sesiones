@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Usuario</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Actualizar Usuario</h1>
+        <form action="/update-user/<%= user.id %>" method="POST">
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="<%= user.nombre %>" required>
+            </div>
+            <div class="form-group">
+                <label for="apellido_paterno">Apellido Paterno:</label>
+                <input type="text" class="form-control" id="apellidopat" name="apellidopat" value="<%= user.apellidopat %>" required>
+            </div>
+            <div class="form-group">
+                <label for="apellido_materno">Apellido Materno:</label>
+                <input type="text" class="form-control" id="apellidomat" name="apellidomat" value="<%= user.apellidomat %>" required>
+            </div>
+            <div class="form-group">
+                <label for="edad">Edad:</label>
+                <input type="number" class="form-control" id="edad" name="edad" value="<%= user.edad %>" required>
+            </div>
+            <div class="form-group">
+                <label for="sexo">Sexo:</label>
+                <select class="form-control" id="sexo" name="sexo" required>
+                    <option value="M" <%= user.sexo === 'M' ? 'selected' : '' %>>Masculino</option>
+                    <option value="F" <%= user.sexo === 'F' ? 'selected' : '' %>>Femenino</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="num_telefono">Número de Teléfono:</label>
+                <input type="text" class="form-control" id="num_telefono" name="num_telefono" value="<%= user.num_telefono %>" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+</body>
+</html>
