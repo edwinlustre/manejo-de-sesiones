@@ -28,7 +28,7 @@ exports.addUserDetails = async (req, res) => {
     const { nombre, apellidopat, apellidomat, edad, sexo, num_telefono } = req.body;
     try {
         await UserDetails.create({ nombre, apellidopat, apellidomat, edad, sexo, num_telefono });
-        await UserModifications.create({ user_id: req.session.userId, action: 'Created user details' });
+        await UserModifications.create({ user_id: req.session.userId, action: 'El usuario ha creado un perfil' });
         res.redirect('/profile');
     } catch (error) {
         console.error(error);
@@ -43,7 +43,7 @@ exports.updateUserDetails = async (req, res) => {
             { nombre, apellidopat, apellidomat, edad, sexo, num_telefono },
             { where: { id: req.params.id } }
         );
-        await UserModifications.create({ user_id: req.session.userId, action: 'Updated user details' });
+        await UserModifications.create({ user_id: req.session.userId, action: 'El usuario ha actualizado el perfil' });
         res.redirect('/profile');
     } catch (error) {
         console.error(error);
@@ -55,7 +55,7 @@ exports.deleteUserDetails = async (req, res) => {
     const { id } = req.body;
     try {
         await UserDetails.destroy({ where: { id } });
-        await UserModifications.create({ user_id: req.session.userId, action: 'Deleted user details' });
+        await UserModifications.create({ user_id: req.session.userId, action: 'El usuario ha eliminado el perfil' });
         res.redirect('/profile');
     } catch (error) {
         console.error(error);
