@@ -3,9 +3,7 @@ const router = express.Router();
 const userControllerSignup = require('../controllers/signup');
 const userControllerLogin = require('../controllers/login');
 const userControllerLogout = require('../controllers/logout');
-const userControllerProfile = require('../controllers/profile');
 const userControllerError = require('../controllers/error');
-const isAuthenticated = require('../middlewares/auth');
 const userControllerStart = require('../controllers/start');
 const userController = require('../controllers/registrousuario');
 const modificationController = require('../controllers/modificacionusuario');
@@ -16,8 +14,6 @@ router.post('/signup', userControllerSignup.postSignup);
 router.get('/login', userControllerLogin.getLogin);
 router.post('/login', userControllerLogin.postLogin);
 
-//router.get('/profile', isAuthenticated, userControllerProfile.getProfile);
-
 router.get('/logout', userControllerLogout.getLogout);
 
 router.get('/error', userControllerError.getError);
@@ -25,6 +21,7 @@ router.get('/error', userControllerError.getError);
 router.get('/start', userControllerStart.getStart)
 
 router.get('/profile', userController.getUserDetails);
+
 router.get('/add-user', (req, res) => res.render('add-user'));
 router.post('/add-user', userController.addUserDetails);
 router.get('/update-user/:id', userController.getUpdateUserForm);

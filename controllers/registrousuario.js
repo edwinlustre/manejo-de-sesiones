@@ -1,7 +1,9 @@
 const UserDetails = require('../models/registrousuario');
 const UserModifications = require('../models/modificacionusuario');
 
-exports.getUserDetails = async (req, res) => {
+const userControllerRegistro = {};
+
+userControllerRegistro.getUserDetails = async (req, res) => {
     try {
         const details = await UserDetails.findAll();
         res.render('profile', { details });
@@ -11,7 +13,7 @@ exports.getUserDetails = async (req, res) => {
     }
 };
 
-exports.getUpdateUserForm = async (req, res) => {
+userControllerRegistro.getUpdateUserForm = async (req, res) => {
     try {
         const user = await UserDetails.findByPk(req.params.id);
         if (!user) {
@@ -24,11 +26,11 @@ exports.getUpdateUserForm = async (req, res) => {
     }
 };
 
-exports.addUserDetails = async (req, res) => {
+userControllerRegistro.addUserDetails = async (req, res) => {
     const { nombre, apellidopat, apellidomat, edad, sexo, num_telefono } = req.body;
     try {
-        await UserDetails.create({ nombre, apellidopat, apellidomat, edad, sexo, num_telefono });
-        await UserModifications.create({ user_id: req.session.userId, action: 'El usuario ha creado un perfil' });
+        const newUser = await UserDetails.create({ nombre, apellidopat, apellidomat, edad, sexo, num_telefono });
+        await UserModifications.create({ user_id: req.session.userId, action: `El usuario ha creado un perfil con ID: ${newUser.id}` });
         res.redirect('/profile');
     } catch (error) {
         console.error(error);
@@ -36,14 +38,14 @@ exports.addUserDetails = async (req, res) => {
     }
 };
 
-exports.updateUserDetails = async (req, res) => {
+userControllerRegistro.updateUserDetails = async (req, res) => {
     const { nombre, apellidopat, apellidomat, edad, sexo, num_telefono } = req.body;
     try {
         await UserDetails.update(
             { nombre, apellidopat, apellidomat, edad, sexo, num_telefono },
             { where: { id: req.params.id } }
         );
-        await UserModifications.create({ user_id: req.session.userId, action: 'El usuario ha actualizado el perfil' });
+        await UserModifications.create({ user_id: req.session.userId, action: `El usuario ha actualizado el perfil con ID: ${req.params.id}` });
         res.redirect('/profile');
     } catch (error) {
         console.error(error);
@@ -51,14 +53,16 @@ exports.updateUserDetails = async (req, res) => {
     }
 };
 
-exports.deleteUserDetails = async (req, res) => {
+userControllerRegistro.deleteUserDetails = async (req, res) => {
     const { id } = req.body;
     try {
         await UserDetails.destroy({ where: { id } });
-        await UserModifications.create({ user_id: req.session.userId, action: 'El usuario ha eliminado el perfil' });
+        await UserModifications.create({ user_id: req.session.userId, action: `El usuario ha eliminado el perfil con ID: ${id}` });
         res.redirect('/profile');
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
-}
+};
+
+module.exports = userControllerRegistro;

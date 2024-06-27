@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const sessionStore = require('./sesion/sessionStore');
 const sequelize = require('./db/database');
 const authRoutes = require('./routes/user.js');
+const crudRoutes = require('./routes/crud.js');
 const app = express();
 
 //! Configuracion de la app
@@ -38,6 +39,7 @@ sequelize.sync();
 
 // Rutas
 app.use(authRoutes);
+app.use(crudRoutes);
 
 app.get('/', (req, res) => {
   res.render('home', { userId: req.session.userId });
